@@ -51,8 +51,8 @@ class WeatherService {
   // TODO: Define the baseURL, API key, and city name properties
   // TODO: Create fetchLocationData method
   private async fetchLocationData(query: string) {
-    const coridinateData = await fetch(query)
-    return coridinateData;
+    const coordinateData = await fetch(query)
+    return coordinateData;
   }
 
 
@@ -64,22 +64,69 @@ class WeatherService {
   }
   // TODO: Create buildGeocodeQuery method
   private buildGeocodeQuery(): string {
-return "http://api.openweathermap.org/geo/1.0/direct?q="+ this.cityName;
+return `http://api.openweathermap.org/geo/1.0/direct?q=${this.cityName} &appid=${this.APIkey}`;
   }
   // TODO: Create buildWeatherQuery method
   private buildWeatherQuery(coordinates: Coordinates): string {
-    return `https://api.openweathermap.org/data/2.5/forecast?lat=${cordinates.lat}&lon=${cordinates.lon}&appid=${this.APIkey}`
+    return `https://api.openweathermap.org/data/2.5/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${this.APIkey}`
   }
   // TODO: Create fetchAndDestructureLocationData method
-  private async fetchAndDestructureLocationData() {}
+  private async fetchAndDestructureLocationData(): Promise<Coordinates> {
+    const geocodeQuery = this.buildGeocodeQuery();
+  const locationData = await this.fetchLocationData(geocodeQuery);
+  const locationJson = await locationData.json(); 
+  const coordinates = this.destructureLocationData(locationJson);
+  return coordinates;
+  }
   // TODO: Create fetchWeatherData method
-  private async fetchWeatherData(coordinates: Coordinates) {}
+  private async fetchWeatherData(coordinates: Coordinates) {
+    const weatherQuery = this.buildWeatherQuery(coordinates);
+  const weatherResponse = await fetch(weatherQuery);
+  return weatherResponse.json();
+  }
   // TODO: Build parseCurrentWeather method
-  private parseCurrentWeather(response: any) {}
+  private parseCurrentWeather(response: any): Weather {
+    const currentWeather = response.list[0]; // Assuming first item in list is current weather
+  const weather = new Weather(
+    this.cityName,
+    currentWeather.dt_txt, 
+    currentWeather.weather[0].icon, 
+    currentWeather.weather[0].description,
+    currentWeather.main.temp, 
+    currentWeather.wind.speed, 
+    currentWeather.main.humidity 
+  );
+  return weather;
+  }
   // TODO: Complete buildForecastArray method
-   private buildForecastArray(currentWeather: Weather, weatherData: any[]) {}
+   private buildForecastArray(currentWeather: Weather, weatherData: any[]): Weather[] {
+    const forecastArray = [currentWeather];
+
+    weatherData.slice(1, 5).forEach((forecast) => { 
+      const weather = new Weather(
+        this.cityName,
+        forecast.dt_txt,
+        forecast.weather[0].icon,
+        forecast.weather[0].description,
+        forecast.main.temp,
+        forecast.wind.speed,
+        forecast.main.humidity
+      );
+      forecastArray.push(weather);
+    });
+    
+    return forecastArray;
+   }
   // TODO: Complete getWeatherForCity method
-  async getWeatherForCity(city: string) {}
+  async getWeatherForCity(city: string): Promise<Weather[]> {
+    this.cityName = city; // Update the city name
+  const coordinates = await this.fetchAndDestructureLocationData();
+  const weatherData = await this.fetchWeatherData(coordinates);
+  const currentWeather = this.parseCurrentWeather(weatherData);
+  const forecastArray = this.buildForecastArray(currentWeather, weatherData.list);
+  
+  return forecastArray;
+  }
 }
 
 export default new WeatherService();
