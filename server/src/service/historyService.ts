@@ -1,4 +1,5 @@
 const fs = require('fs').promises;
+import { v4 as uuidv4 } from 'uuid';
 
 // TODO: Define a City class with name and id properties
 class City {
@@ -38,9 +39,10 @@ class HistoryService {
     return await this.read();
   }
 
-  async addCity(name: string, id: string): Promise<void> {
+  async addCity(name: string): Promise<void> {
+
     const cities = await this.read();
-    const newCity = new City(name, id);
+    const newCity = new City(name, uuidv4());
     cities.push(newCity);
     await this.write(cities);
   }
