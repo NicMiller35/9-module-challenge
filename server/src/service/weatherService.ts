@@ -39,7 +39,8 @@ class WeatherService {
   APIkey: string;
   cityName: string;
 
-  constructor(baseURL: string,
+  constructor(
+    baseURL: string,
     APIkey: string,
     cityName: string,) {
       this.baseURL = baseURL;
@@ -93,8 +94,8 @@ return `http://api.openweathermap.org/geo/1.0/direct?q=${this.cityName} &appid=$
     currentWeather.weather[0].icon, 
     currentWeather.weather[0].description,
     currentWeather.main.temp, 
-    currentWeather.wind.speed, 
-    currentWeather.main.humidity 
+    currentWeather.wind.speed.toString(), 
+    currentWeather.main.humidity.toString()
   );
   return weather;
   }
@@ -109,8 +110,8 @@ return `http://api.openweathermap.org/geo/1.0/direct?q=${this.cityName} &appid=$
         forecast.weather[0].icon,
         forecast.weather[0].description,
         forecast.main.temp,
-        forecast.wind.speed,
-        forecast.main.humidity
+        forecast.wind.speed.toString(),
+        forecast.main.humidity.toString()
       );
       forecastArray.push(weather);
     });
