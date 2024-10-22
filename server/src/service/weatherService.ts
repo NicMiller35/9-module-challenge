@@ -34,6 +34,9 @@ class Weather {
     }
 }
 // TODO: Complete the WeatherService class
+
+//can I take these arguements out?
+
 class WeatherService {
   baseURL: string;
   APIkey: string;
@@ -59,6 +62,7 @@ class WeatherService {
 
   // TODO: Create destructureLocationData method
   private destructureLocationData(locationData: any): Coordinates {
+    console.log(locationData)
     const lat= locationData[0].lat;
     const lon= locationData[0].lon;
     return {lat, lon}
@@ -74,8 +78,10 @@ return `http://api.openweathermap.org/geo/1.0/direct?q=${this.cityName} &appid=$
   // TODO: Create fetchAndDestructureLocationData method
   private async fetchAndDestructureLocationData(): Promise<Coordinates> {
     const geocodeQuery = this.buildGeocodeQuery();
+    console.log(geocodeQuery)
   const locationData = await this.fetchLocationData(geocodeQuery);
   const locationJson = await locationData.json(); 
+  console.log(locationJson)
   const coordinates = this.destructureLocationData(locationJson);
   return coordinates;
   }
@@ -103,7 +109,7 @@ return `http://api.openweathermap.org/geo/1.0/direct?q=${this.cityName} &appid=$
    private buildForecastArray(currentWeather: Weather, weatherData: any[]): Weather[] {
     const forecastArray = [currentWeather];
 
-    weatherData.slice(1, 5).forEach((forecast) => { 
+    weatherData.slice(0, 5).forEach((forecast) => { 
       const weather = new Weather(
         this.cityName,
         forecast.dt_txt,
@@ -113,11 +119,15 @@ return `http://api.openweathermap.org/geo/1.0/direct?q=${this.cityName} &appid=$
         forecast.wind.speed.toString(),
         forecast.main.humidity.toString()
       );
+      console.log(forecast.dt_txt);
+      console.log(forecast.main.temp)
       forecastArray.push(weather);
     });
     
     return forecastArray;
    }
+   
+
   // TODO: Complete getWeatherForCity method
   async getWeatherForCity(city: string): Promise<Weather[]> {
     this.cityName = city; // Update the city name
@@ -130,4 +140,8 @@ return `http://api.openweathermap.org/geo/1.0/direct?q=${this.cityName} &appid=$
   }
 }
 
-export default new WeatherService();
+const baseURL = 'http://api.openweathermap.org';
+const APIkey = process.env.API_KEY || '159516bd001985ebdd55bf62524d0ad9';
+const cityName = 'default_city';
+
+export default new WeatherService(baseURL, APIkey, cityName);
