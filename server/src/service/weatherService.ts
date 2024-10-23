@@ -1,5 +1,4 @@
 import dotenv from 'dotenv';
-import dayjs from 'dayjs';
 dotenv.config();
 
 // TODO: Define an interface for the Coordinates object
@@ -96,7 +95,7 @@ return `http://api.openweathermap.org/geo/1.0/direct?q=${this.cityName}&limit=1&
     const currentWeather = response.list[0];
     const weather = new Weather(
     this.cityName,
-    currentWeather.dayjs(currentWeather.dt_txt).format('dddd'), 
+    currentWeather.dt_txt, 
     currentWeather.weather[0].icon, 
     currentWeather.weather[0].description,
     currentWeather.main.temp,
@@ -117,7 +116,7 @@ return `http://api.openweathermap.org/geo/1.0/direct?q=${this.cityName}&limit=1&
       const weather = new Weather(
         this.cityName,
         //use datejs
-        forecast.dayjs(forecast.dt_txt).format('dddd'),
+        forecast.dt_txt,
         forecast.weather[0].icon,
         forecast.weather[0].description,
         forecast.main.temp,
